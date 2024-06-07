@@ -1,5 +1,5 @@
 import { Container } from "@/styles/CommonStyles";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import InputItem from "@/components/ui/InputItem";
 import ImageUpload from "@/components/ui/ImageUpload";
@@ -12,7 +12,7 @@ const AddBoardPage = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isSubmitDisabled) {
-      return router.push(`/board`);
+      return router.push(`/boards`);
     }
   };
 

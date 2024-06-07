@@ -16,7 +16,6 @@ const SectionTitle = styled.h1`
   font-weight: 600;
 `;
 
-// TODO: InputItem 컴포넌트의 textarea와 겹치므로 common styles에 추가할 것
 const TextArea = styled.textarea`
   background-color: ${({ theme }) => theme.colors.gray[100]};
   border: none;
@@ -54,7 +53,7 @@ interface ItemCommentSectionProps {
   articleId: number;
 }
 
-const ItemCommentSection: React.FC<ItemCommentSectionProps> = ({
+const BoardCommentSection: React.FC<ItemCommentSectionProps> = ({
   articleId,
 }) => {
   const [comment, setComment] = useState("");
@@ -89,4 +88,4 @@ const ItemCommentSection: React.FC<ItemCommentSectionProps> = ({
   );
 };
 
-export default ItemCommentSection;
+export default BoardCommentSection;

@@ -94,7 +94,7 @@ interface CommentThreadProps {
   articleId: number;
 }
 
-const CommentThread: React.FC<CommentThreadProps> = ({ articleId }) => {
+const BoardCommentThread: React.FC<CommentThreadProps> = ({ articleId }) => {
   const [comments, setComments] = useState<ProductComment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -143,4 +143,4 @@ const CommentThread: React.FC<CommentThreadProps> = ({ articleId }) => {
   }
 };
 
-export default CommentThread;
+export default BoardCommentThread;
