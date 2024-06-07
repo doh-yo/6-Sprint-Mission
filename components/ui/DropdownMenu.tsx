@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 import SortIcon from "@/public/images/icons/ic_sort.svg";
+import Image from "next/image";
 
 const SortButtonWrapper = styled.div`
   position: relative;
@@ -54,7 +55,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   return (
     <SortButtonWrapper>
       <SortDropdownTriggerButton onClick={toggleDropdown}>
-        <SortIcon />
+        <Image src={SortIcon} alt="정렬아이콘" width={15} height={7} />
       </SortDropdownTriggerButton>
 
       {isDropdownVisible && (

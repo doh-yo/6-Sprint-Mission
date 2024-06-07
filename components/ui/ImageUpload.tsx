@@ -1,7 +1,8 @@
 import React, { useState, ChangeEvent } from "react";
 import { Label } from "@/components/ui/InputItem";
 import styled, { css } from "styled-components";
-import { ReactComponent as PlusIcon } from "@/public/images/icons/ic_plus.svg";
+import Image from "next/image";
+import PlusIcon from "@/public/images/icons/ic_plus.svg";
 import DeleteButton from "./DeleteButton";
 
 const ImageUploadContainer = styled.div`
@@ -94,7 +95,7 @@ function ImageUpload({ title }: ImageUploadProps) {
 
       <ImageUploadContainer>
         <UploadButton htmlFor="image-upload">
-          <PlusIcon />
+          <Image src={PlusIcon} alt="등록아이콘" width={48} height={48} />
           이미지 등록
         </UploadButton>
 

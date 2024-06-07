@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import LeftArrow from "@/public/images/icons/arrow_left.svg";
 import RightArrow from "@/public/images/icons/arrow_right.svg";
+import Image from "next/image";
 
 const PaginationBarContainer = styled.div`
   display: flex;
@@ -59,7 +60,7 @@ const PaginationBar: React.FC<PaginationBarProps> = ({
         onClick={() => onPageChange(activePageNum - 1)}
         aria-label="이전 페이지로 이동 버튼"
       >
-        <LeftArrow />
+        <Image src={LeftArrow} alt="왼쪽버튼" width={40} height={40} />
       </PaginationButton>
       {pages.map((page) => (
         <PaginationButton
@@ -75,7 +76,7 @@ const PaginationBar: React.FC<PaginationBarProps> = ({
         onClick={() => onPageChange(activePageNum + 1)}
         aria-label="다음 페이지로 이동 버튼"
       >
-        <RightArrow />
+        <Image src={RightArrow} alt="오른쪽버튼" width={40} height={40} />
       </PaginationButton>
     </PaginationBarContainer>
   );
