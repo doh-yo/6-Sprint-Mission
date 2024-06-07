@@ -80,7 +80,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({ article }) => {
   );
 };
 
-const AddArticleLink = styled(StyledLink)``;
+const AddBoardLink = styled(StyledLink)``;
 
 interface AllArticlesSectionProps {
   initialArticles: Article[];
@@ -130,7 +130,7 @@ const AllArticlesSection: React.FC<AllArticlesSectionProps> = ({
     <div>
       <SectionHeader>
         <SectionTitle>게시글</SectionTitle>
-        <AddArticleLink href="/addArticle">글쓰기</AddArticleLink>
+        <AddBoardLink href="/addboard">글쓰기</AddBoardLink>
       </SectionHeader>
 
       <SectionHeader>
