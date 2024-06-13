@@ -1,77 +1,72 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "../../lib/axios"; // axios 인스턴스 import
 import kakao from "../../assets/images/social/kakao-logo.png";
 import google from "../../assets/images/social/google-logo.png";
-import eyeinvisible from "../../assets/images/icons/eye-invisible.svg";
-import eyevisible from "../../assets/images/icons/eye-visible.svg";
 import logo from "../../assets/images/logo/logo.svg";
 import "../../styles/auth.css";
 import "../../styles/global.css";
 
-function SignupPage() {
-  const [email, setEmail] = useState<string>("");
-  const [nickname, setNickname] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [passwordConfirmation, setPasswordConfirmation] = useState<string>("");
-  const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
-  const [isNicknameValid, setIsNicknameValid] = useState<boolean>(false);
-  const [isPasswordValid, setIsPasswordValid] = useState<boolean>(false);
-  const [isPasswordConfirmationValid, setIsPasswordConfirmationValid] =
-    useState<boolean>(false);
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [isPasswordConfirmationVisible, setIsPasswordConfirmationVisible] =
-    useState<boolean>(false);
+interface FormValues {
+  nickname: string;
+  email: string;
+  password: string;
+  passwordRepeat: string;
+}
 
-  useEffect(() => {
-    const emailRegex = /^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
-    setIsEmailValid(emailRegex.test(email));
-  }, [email]);
+const SignupPage: React.FC = () => {
+  const [values, setValues] = useState<FormValues>({
+    nickname: "",
+    email: "",
+    password: "",
+    passwordRepeat: "",
+  });
+  const navigate = useNavigate();
+  const user = localStorage.getItem("accessToken");
 
-  useEffect(() => {
-    setIsNicknameValid(nickname.length > 0);
-  }, [nickname]);
-
-  useEffect(() => {
-    setIsPasswordValid(password.length >= 8);
-    setIsPasswordConfirmationValid(password === passwordConfirmation);
-  }, [password, passwordConfirmation]);
-
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
   };
 
-  const handleNicknameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.target.value);
-  };
-
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const handlePasswordConfirmationChange = (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    setPasswordConfirmation(e.target.value);
-  };
-
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
-
-  const togglePasswordConfirmationVisibility = () => {
-    setIsPasswordConfirmationVisible(!isPasswordConfirmationVisible);
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (
-      isEmailValid &&
-      isNicknameValid &&
-      isPasswordValid &&
-      isPasswordConfirmationValid
-    ) {
-      window.location.href = "/login";
+
+    if (values.password !== values.passwordRepeat) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    const { nickname, email, password } = values;
+    try {
+      await axios.post("/auth/signUp", {
+        nickname,
+        email,
+        password,
+      });
+
+      // 회원가입 후 로그인 처리
+      const response = await axios.post("/auth/login", {
+        email,
+        password,
+      });
+
+      // 로그인 성공 시 토큰 저장 및 페이지 이동
+      if (response.data.accessToken) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("회원가입 실패:", error);
     }
   };
+
+  useEffect(() => {
+    if (user) navigate("/login");
+  }, [user, navigate]);
 
   return (
     <div className="body">
@@ -88,20 +83,10 @@ function SignupPage() {
               name="email"
               type="email"
               placeholder="이메일을 입력해 주세요"
-              value={email}
-              onChange={handleEmailChange}
+              value={values.email}
+              onChange={handleChange}
               required
             />
-            {!email && (
-              <span id="emailEmptyError" className="error-message">
-                이메일을 입력해 주세요
-              </span>
-            )}
-            {email && !isEmailValid && (
-              <span id="emailInvalidError" className="error-message">
-                잘못된 이메일 형식입니다
-              </span>
-            )}
           </div>
 
           <div className="input-item">
@@ -111,15 +96,10 @@ function SignupPage() {
               name="nickname"
               type="text"
               placeholder="닉네임을 입력해 주세요"
-              value={nickname}
-              onChange={handleNicknameChange}
+              value={values.nickname}
+              onChange={handleChange}
               required
             />
-            {!nickname && (
-              <span id="nicknameEmptyError" className="error-message">
-                닉네임을 입력해 주세요
-              </span>
-            )}
           </div>
 
           <div className="input-item">
@@ -128,41 +108,13 @@ function SignupPage() {
               <input
                 id="password"
                 name="password"
-                type={isPasswordVisible ? "text" : "password"}
+                type="password"
                 placeholder="비밀번호를 입력해 주세요"
-                value={password}
-                onChange={handlePasswordChange}
+                value={values.password}
+                onChange={handleChange}
                 required
               />
-              <button
-                type="button"
-                className="password-toggle-button"
-                aria-label={
-                  isPasswordVisible ? "비밀번호 숨기기" : "비밀번호 보기"
-                }
-                onClick={togglePasswordVisibility}
-              >
-                <img
-                  className="password-toggle-icon"
-                  src={isPasswordVisible ? eyevisible : eyeinvisible}
-                  alt={
-                    isPasswordVisible
-                      ? "비밀번호 숨김 상태 아이콘"
-                      : "비밀번호 표시 상태 아이콘"
-                  }
-                />
-              </button>
             </div>
-            {!password && (
-              <span id="passwordEmptyError" className="error-message">
-                비밀번호를 입력해 주세요
-              </span>
-            )}
-            {password && password.length < 8 && (
-              <span id="passwordInvalidError" className="error-message">
-                비밀번호를 8자 이상 입력해 주세요
-              </span>
-            )}
           </div>
 
           <div className="input-item">
@@ -170,53 +122,17 @@ function SignupPage() {
             <div className="input-wrapper">
               <input
                 id="passwordConfirmation"
-                name="passwordConfirmation"
-                type={isPasswordConfirmationVisible ? "text" : "password"}
+                name="passwordRepeat"
+                type="password"
                 placeholder="비밀번호를 다시 한 번 입력해 주세요"
-                value={passwordConfirmation}
-                onChange={handlePasswordConfirmationChange}
+                value={values.passwordRepeat}
+                onChange={handleChange}
                 required
               />
-              <button
-                type="button"
-                className="password-toggle-button"
-                aria-label={
-                  isPasswordConfirmationVisible
-                    ? "비밀번호 숨기기"
-                    : "비밀번호 보기"
-                }
-                onClick={togglePasswordConfirmationVisibility}
-              >
-                <img
-                  className="password-toggle-icon"
-                  src={
-                    isPasswordConfirmationVisible ? eyevisible : eyeinvisible
-                  }
-                  alt={
-                    isPasswordConfirmationVisible
-                      ? "비밀번호 숨김 상태 아이콘"
-                      : "비밀번호 표시 상태 아이콘"
-                  }
-                />
-              </button>
             </div>
-            {passwordConfirmation && !isPasswordConfirmationValid && (
-              <span id="passwordConfirmationError" className="error-message">
-                비밀번호가 일치하지 않습니다
-              </span>
-            )}
           </div>
 
-          <button
-            type="submit"
-            className="button pill-button full-width"
-            disabled={
-              !isEmailValid ||
-              !isNicknameValid ||
-              !isPasswordValid ||
-              !isPasswordConfirmationValid
-            }
-          >
+          <button type="submit" className="button pill-button full-width">
             회원가입
           </button>
         </form>
@@ -249,6 +165,6 @@ function SignupPage() {
       </main>
     </div>
   );
-}
+};
 
 export default SignupPage;
