@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../lib/axios";
@@ -26,6 +26,13 @@ const SignupPage: React.FC = () => {
 
   const password = useRef<string | null>(null);
   password.current = watch("password");
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   const onSubmit: SubmitHandler<FormValues> = async ({
     email,
