@@ -33,7 +33,7 @@ const SignupPage: React.FC = () => {
         email: data.email,
         nickname: data.nickname,
         password: data.password,
-        passwordConfirmation: data.password,
+        passwordConfirmation: data.passwordConfirmation,
       });
 
       console.log("Signup successful!", response.data);
