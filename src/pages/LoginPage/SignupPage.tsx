@@ -59,7 +59,7 @@ const SignupPage: React.FC = () => {
                 required: { value: true, message: "이메일을 입력해 주세요" },
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: "이메일 형식이 올바르지 않습니다.",
+                  message: "잘못된 이메일 형식입니다.",
                 },
               })}
             />
@@ -92,7 +92,7 @@ const SignupPage: React.FC = () => {
                 required: { value: true, message: "비밀번호를 입력해 주세요" },
                 minLength: {
                   value: 8,
-                  message: "비밀번호 길이를 8자리 이상 입력해주세요",
+                  message: "비밀번호를 8자 이상 입력해주세요",
                 },
               })}
             />
