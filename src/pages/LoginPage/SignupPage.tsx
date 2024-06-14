@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import axios from "../../lib/axios";
+import apiClient from "../../lib/axios";
 import kakao from "../../assets/images/social/kakao-logo.png";
 import google from "../../assets/images/social/google-logo.png";
 import logo from "../../assets/images/logo/logo.svg";
@@ -12,7 +12,7 @@ interface FormValues {
   nickname: string;
   email: string;
   password: string;
-  passwordRepeat: string;
+  passwordConfirmation: string;
 }
 
 const SignupPage: React.FC = () => {
@@ -27,19 +27,13 @@ const SignupPage: React.FC = () => {
   const password = useRef<string | null>(null);
   password.current = watch("password");
 
-  React.useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      navigate("/");
-    }
-  }, [navigate]);
-
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      const response = await axios.post("auth/signUp", {
-        nickname: data.nickname,
+      const response = await apiClient.post("auth/signUp", {
         email: data.email,
+        nickname: data.nickname,
         password: data.password,
+        passwordConfirmation: data.password,
       });
 
       console.log("Signup successful!", response.data);
@@ -113,7 +107,7 @@ const SignupPage: React.FC = () => {
               id="passwordConfirmation"
               type="password"
               placeholder="비밀번호를 다시 입력해 주세요."
-              {...register("passwordRepeat", {
+              {...register("passwordConfirmation", {
                 required: {
                   value: true,
                   message: "비밀번호를 다시 입력해 주세요",
@@ -122,8 +116,10 @@ const SignupPage: React.FC = () => {
                   value === password.current || "비밀번호가 일치하지 않습니다.",
               })}
             />
-            {errors.passwordRepeat && (
-              <p className="error-message">{errors.passwordRepeat.message}</p>
+            {errors.passwordConfirmation && (
+              <p className="error-message">
+                {errors.passwordConfirmation.message}
+              </p>
             )}
           </div>
 

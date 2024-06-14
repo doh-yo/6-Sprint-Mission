@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import axios from "../../lib/axios";
+import apiClient from "../../lib/axios";
 import kakao from "../../assets/images/social/kakao-logo.png";
 import google from "../../assets/images/social/google-logo.png";
 import logo from "../../assets/images/logo/logo.svg";
@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      const response = await axios.post("/auth/signIn", {
+      const response = await apiClient.post("/auth/signIn", {
         email: data.email,
         password: data.password,
       });
