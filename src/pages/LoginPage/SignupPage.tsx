@@ -1,6 +1,7 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, { useRef } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import axios from "../../lib/axios"; // axios 인스턴스 import
+import axios from "../../lib/axios";
 import kakao from "../../assets/images/social/kakao-logo.png";
 import google from "../../assets/images/social/google-logo.png";
 import logo from "../../assets/images/logo/logo.svg";
@@ -15,59 +16,38 @@ interface FormValues {
 }
 
 const SignupPage: React.FC = () => {
-  const [values, setValues] = useState<FormValues>({
-    nickname: "",
-    email: "",
-    password: "",
-    passwordRepeat: "",
-  });
   const navigate = useNavigate();
-  const user = localStorage.getItem("accessToken");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormValues>();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setValues((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
-  };
+  const password = useRef<string | null>(null);
+  password.current = watch("password");
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (values.password !== values.passwordRepeat) {
-      alert("비밀번호가 일치하지 않습니다.");
-      return;
+  React.useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      navigate("/");
     }
+  }, [navigate]);
 
-    const { nickname, email, password } = values;
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      await axios.post("/auth/signUp", {
-        nickname,
-        email,
-        password,
+      const response = await axios.post("auth/signUp", {
+        nickname: data.nickname,
+        email: data.email,
+        password: data.password,
       });
 
-      // 회원가입 후 로그인 처리
-      const response = await axios.post("/auth/login", {
-        email,
-        password,
-      });
-
-      // 로그인 성공 시 토큰 저장 및 페이지 이동
-      if (response.data.accessToken) {
-        localStorage.setItem("accessToken", response.data.accessToken);
-        navigate("/login");
-      }
+      console.log("Signup successful!", response.data);
+      navigate("/login");
     } catch (error) {
-      console.error("회원가입 실패:", error);
+      console.error("Signup error:", error);
     }
   };
-
-  useEffect(() => {
-    if (user) navigate("/login");
-  }, [user, navigate]);
-
   return (
     <div className="body">
       <main className="auth-container">
@@ -75,61 +55,76 @@ const SignupPage: React.FC = () => {
           <img src={logo} alt="판다마켓 로고" />
         </a>
 
-        <form id="loginForm" method="post" onSubmit={handleSubmit}>
+        <form id="loginForm" onSubmit={handleSubmit(onSubmit)}>
           <div className="input-item">
             <label className="email">이메일</label>
             <input
               id="email"
-              name="email"
-              type="email"
-              placeholder="이메일을 입력해 주세요"
-              value={values.email}
-              onChange={handleChange}
-              required
+              placeholder="이메일을 입력해 주세요."
+              {...register("email", {
+                required: { value: true, message: "이메일을 입력해 주세요" },
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: "이메일 형식이 올바르지 않습니다.",
+                },
+              })}
             />
+            {errors.email && (
+              <p className="error-message">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="input-item">
             <label className="nickname">닉네임</label>
             <input
               id="nickname"
-              name="nickname"
-              type="text"
-              placeholder="닉네임을 입력해 주세요"
-              value={values.nickname}
-              onChange={handleChange}
-              required
+              placeholder="닉네임을 입력해 주세요."
+              {...register("nickname", {
+                required: { value: true, message: "닉네임을 입력해 주세요" },
+              })}
             />
+            {errors.nickname && (
+              <p className="error-message">{errors.nickname.message}</p>
+            )}
           </div>
 
           <div className="input-item">
             <label className="password">비밀번호</label>
-            <div className="input-wrapper">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="비밀번호를 입력해 주세요"
-                value={values.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <input
+              id="password"
+              type="password"
+              placeholder="비밀번호를 입력해 주세요."
+              {...register("password", {
+                required: { value: true, message: "비밀번호를 입력해 주세요" },
+                minLength: {
+                  value: 8,
+                  message: "비밀번호 길이를 8자리 이상 입력해주세요",
+                },
+              })}
+            />
+            {errors.password && (
+              <p className="error-message">{errors.password.message}</p>
+            )}
           </div>
 
           <div className="input-item">
             <label className="passwordConfirmation">비밀번호 확인</label>
-            <div className="input-wrapper">
-              <input
-                id="passwordConfirmation"
-                name="passwordRepeat"
-                type="password"
-                placeholder="비밀번호를 다시 한 번 입력해 주세요"
-                value={values.passwordRepeat}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <input
+              id="passwordConfirmation"
+              type="password"
+              placeholder="비밀번호를 다시 입력해 주세요."
+              {...register("passwordRepeat", {
+                required: {
+                  value: true,
+                  message: "비밀번호를 다시 입력해 주세요",
+                },
+                validate: (value) =>
+                  value === password.current || "비밀번호가 일치하지 않습니다.",
+              })}
+            />
+            {errors.passwordRepeat && (
+              <p className="error-message">{errors.passwordRepeat.message}</p>
+            )}
           </div>
 
           <button type="submit" className="button pill-button full-width">
