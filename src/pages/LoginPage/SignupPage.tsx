@@ -48,12 +48,13 @@ const SignupPage: React.FC = () => {
         passwordConfirmation,
       });
 
-      localStorage.setItem("accessToken", response.data.accessToken);
+      localStorage.setItem("Signup successful!", response.data);
       navigate("/login");
     } catch (error) {
       console.error("Signup error:", error);
     }
   };
+
   return (
     <div className="body">
       <main className="auth-container">
@@ -61,7 +62,7 @@ const SignupPage: React.FC = () => {
           <img src={logo} alt="판다마켓 로고" />
         </a>
 
-        <form id="loginForm" onSubmit={handleSubmit(onSubmit)}>
+        <form id="signupForm" onSubmit={handleSubmit(onSubmit)}>
           <div className="input-item">
             <label className="email">이메일</label>
             <input
