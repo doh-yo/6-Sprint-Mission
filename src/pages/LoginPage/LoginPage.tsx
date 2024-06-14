@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../lib/axios";
@@ -22,11 +22,18 @@ const LoginPage: React.FC = () => {
     formState: { errors },
   } = useForm<FormValues>();
 
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  const onSubmit: SubmitHandler<FormValues> = async ({ email, password }) => {
     try {
       const response = await apiClient.post("/auth/signIn", {
-        email: data.email,
-        password: data.password,
+        email,
+        password,
       });
 
       localStorage.setItem("accessToken", response.data.accessToken);

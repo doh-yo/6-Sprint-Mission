@@ -27,16 +27,21 @@ const SignupPage: React.FC = () => {
   const password = useRef<string | null>(null);
   password.current = watch("password");
 
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+  const onSubmit: SubmitHandler<FormValues> = async ({
+    email,
+    nickname,
+    password,
+    passwordConfirmation,
+  }) => {
     try {
       const response = await apiClient.post("auth/signUp", {
-        email: data.email,
-        nickname: data.nickname,
-        password: data.password,
-        passwordConfirmation: data.passwordConfirmation,
+        email,
+        nickname,
+        password,
+        passwordConfirmation,
       });
 
-      console.log("Signup successful!", response.data);
+      localStorage.setItem("accessToken", response.data.accessToken);
       navigate("/login");
     } catch (error) {
       console.error("Signup error:", error);
